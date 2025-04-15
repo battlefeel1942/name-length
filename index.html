@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Input Visual Limit</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --input-width: 460px;
+      --safe-zone-percent: 85%;
+      --side-zone-percent: calc(100% - var(--safe-zone-percent));
+      --side-color: rgba(255, 0, 0, 0.5);
+      --safe-color: rgba(0, 255, 0, 0.15);
+    }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      overflow: hidden;
+      touch-action: none;
+      font-family: 'Roboto', sans-serif;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background: #f0f0f0;
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
+    input[type="text"] {
+      width: var(--input-width);
+      font-size: 24px;
+      border: none;
+      outline: none;
+      text-align: left;
+      color: #000;
+      font-family: 'Roboto', sans-serif;
+      padding: 16px 0;
+      border-bottom: solid 2px black;
+      background: linear-gradient(
+        to right,
+        var(--safe-color) 0%,
+        var(--safe-color) var(--safe-zone-percent),
+        var(--side-color) var(--safe-zone-percent),
+        var(--side-color) 100%
+      );
+    }
+
+    .error {
+      color: red;
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: 500;
+      height: 24px;
+    }
+
+    #measure {
+      position: absolute;
+      visibility: hidden;
+      white-space: nowrap;
+      font-size: 24px;
+      font-family: 'Roboto', sans-serif;
+      padding: 16px 0;
+      line-height: normal;
+      box-sizing: border-box;
+    }
+  </style>
+</head>
+<body>
+
+  <input
+    type="text"
+    id="inputField"
+    placeholder="Stay in the green zone…"
+    autocomplete="off"
+    autocorrect="off"
+    autocapitalize="off"
+    spellcheck="false"
+  />
+  <div class="error" id="errorMessage"></div>
+  <div id="measure"></div>
+
+  <script>
+    const input = document.getElementById("inputField");
+    const errorMsg = document.getElementById("errorMessage");
+    const measure = document.getElementById("measure");
+
+    const SAFE_ZONE_PERCENT = 85; // Match CSS
+
+    function checkOverflow(text) {
+      measure.textContent = text;
+      const inputWidth = input.clientWidth;
+      const safeZoneWidth = (SAFE_ZONE_PERCENT / 100) * inputWidth;
+      const textWidth = measure.offsetWidth;
+
+      return textWidth > safeZoneWidth;
+    }
+
+    input.addEventListener("input", () => {
+      const value = input.value;
+
+      if (/ {2,}/.test(value)) {
+        errorMsg.textContent = "❌ No double spaces allowed.";
+      } else if (/\bAND\b/i.test(value)) {
+        errorMsg.textContent = '❌ The word "AND/and" is not allowed.';
+      } else if (checkOverflow(value)) {
+        errorMsg.textContent = "❌ Your text is overflowing the green zone.";
+      } else {
+        errorMsg.textContent = "";
+      }
+    });
+  </script>
+
+</body>
+</html>
